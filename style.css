@@ -49,6 +49,86 @@ html, body {
   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* ── Dialogue ─────────────────────────────────────────────────────────────── */
+
+.dialogue-screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 1.5rem;
+  background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a12 100%);
+  cursor: pointer;
+  animation: fadein 0.4s ease;
+}
+
+.dialogue-box {
+  width: 100%;
+  max-width: 720px;
+  background: rgba(15, 14, 23, 0.92);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem 1rem;
+  backdrop-filter: blur(4px);
+}
+
+.dialogue-speaker-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.6rem;
+}
+
+.dialogue-speaker {
+  font-size: 0.8rem;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.dialogue-speaker.narrator {
+  color: #444;
+}
+
+.dialogue-progress {
+  font-size: 0.68rem;
+  color: #444;
+  font-family: monospace;
+}
+
+.dialogue-text {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--text);
+  min-height: 3rem;
+}
+
+.dialogue-text.narrator {
+  font-style: italic;
+  color: #aaa;
+}
+
+.dialogue-continue {
+  text-align: right;
+  font-size: 0.8rem;
+  color: var(--gold);
+  margin-top: 0.75rem;
+  opacity: 0;
+  transition: opacity 0.3s;
+  letter-spacing: 0.05em;
+}
+
+.dialogue-continue.visible {
+  opacity: 1;
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
 /* ── Who's Playing ────────────────────────────────────────────────────────── */
 
 .who-playing {
@@ -114,6 +194,13 @@ html, body {
   color: var(--text);
   font-style: italic;
   line-height: 1.4;
+}
+
+.card-wins {
+  font-size: 0.72rem;
+  margin-top: 0.6rem;
+  letter-spacing: 0.04em;
+  opacity: 0.85;
 }
 
 /* ── Exploration ──────────────────────────────────────────────────────────── */
