@@ -1,13 +1,13 @@
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const SESSION_LIMIT = 3;   // battles won before handoff prompt appears
-const SAVE_KEY = 'brothers_quest_save';
+const SAVE_KEY   = 'brothers_quest_save';
+const LEAD_ORDER = ['leo', 'walter', 'james'];
 
 // ─── State ────────────────────────────────────────────────────────────────────
 
 const state = {
   screen: 'who_playing',
-  activePlayer: null,
+  activePlayer: null,      // set per-battle from battleLeadIndex
   party: {},
   enemy: null,
   battleLog: [],
@@ -21,13 +21,13 @@ const state = {
   location: '',
   battlesWon: [],
   totalWins: { leo: 0, walter: 0, james: 0 },
-  sessionWins: 0,
+  battleLeadIndex: 0,      // 0=leo, 1=walter, 2=james — cycles on each win
   prologueSeen: false,
   // ── Dialogue ──
-  dialogueScene: null,   // key into SCENES
+  dialogueScene: null,
   dialogueLine: 0,
-  dialogueDone: false,   // true when current line has finished typing
-  dialogueNext: null,    // screen to go to when scene ends
+  dialogueDone: false,
+  dialogueNext: null,
 };
 
 function initParty() {
@@ -50,12 +50,11 @@ function saveGame() {
     battlesWon: state.battlesWon,
     totalWins: state.totalWins,
     prologueSeen: state.prologueSeen,
+    battleLeadIndex: state.battleLeadIndex,
   };
   try {
     localStorage.setItem(SAVE_KEY, JSON.stringify(save));
-  } catch (e) {
-    // localStorage unavailable (e.g. private browsing) — just continue
-  }
+  } catch (e) {}
 }
 
 function loadGame() {
@@ -64,19 +63,19 @@ function loadGame() {
     if (!raw) return;
     const save = JSON.parse(raw);
     if (save.version !== 1) return;
-    state.battlesWon   = save.battlesWon   || [];
-    state.totalWins    = save.totalWins    || { leo: 0, walter: 0, james: 0 };
-    state.prologueSeen = save.prologueSeen || false;
-  } catch (e) {
-    // Corrupt save — ignore and start fresh
-  }
+    state.battlesWon      = save.battlesWon      || [];
+    state.totalWins       = save.totalWins       || { leo: 0, walter: 0, james: 0 };
+    state.prologueSeen    = save.prologueSeen    || false;
+    state.battleLeadIndex = save.battleLeadIndex || 0;
+  } catch (e) {}
 }
 
 function clearSave() {
   try { localStorage.removeItem(SAVE_KEY); } catch (e) {}
-  state.battlesWon   = [];
-  state.totalWins    = { leo: 0, walter: 0, james: 0 };
-  state.prologueSeen = false;
+  state.battlesWon      = [];
+  state.totalWins       = { leo: 0, walter: 0, james: 0 };
+  state.prologueSeen    = false;
+  state.battleLeadIndex = 0;
 }
 
 // ─── Animation ────────────────────────────────────────────────────────────────
@@ -191,10 +190,10 @@ function render() {
   switch (state.screen) {
     case 'who_playing':  app.innerHTML = renderWhoPlaying(); break;
     case 'exploration':  app.innerHTML = renderExploration(); break;
+    case 'battle_intro': app.innerHTML = renderBattleIntro(); break;
     case 'battle':       app.innerHTML = renderBattle(); break;
     case 'victory':      app.innerHTML = renderVictory(); break;
     case 'defeat':       app.innerHTML = renderDefeat(); break;
-    case 'handoff':      app.innerHTML = renderHandoff(); break;
     case 'win':          app.innerHTML = renderWin(); break;
     case 'dialogue':     app.innerHTML = renderDialogue(); break;
   }
@@ -226,30 +225,31 @@ function renderWhoPlaying() {
   return `
     <div class="screen who-playing">
       <h1 class="title">BROTHERS<br>QUEST</h1>
-      ${hasSave
-        ? `<p class="subtitle">Who's at the keyboard?</p>`
-        : `<p class="subtitle">A quest for three brothers.</p>`
-      }
-      ${!hasSave ? `
-        <button class="btn-main" data-action="new-game" style="margin-bottom:2rem">Begin the Quest →</button>
+      <p class="subtitle">A quest for three brothers.</p>
+      ${hasSave ? `
+        <button class="btn-main" data-action="continue-game">Continue →</button>
+        <button class="btn-small" data-action="new-game" style="margin-top:1rem">↩ Start over (watch intro)</button>
       ` : `
-        <div class="player-cards">
-          ${['leo','walter','james'].map(k => {
-            const c = CHARACTERS[k];
-            const wins = state.totalWins[k];
-            const winsLabel = wins === 1 ? '1 battle won' : `${wins} battles won`;
-            return `
-              <button class="player-card" data-action="choose-player" data-value="${k}" style="border-color:${c.color}">
-                <div class="card-name" style="color:${c.color}">${c.name.toUpperCase()}</div>
-                <div class="card-class">${c.class}</div>
-                <div class="card-tagline">${c.tagline}</div>
-                ${wins > 0 ? `<div class="card-wins" style="color:${c.color}">${winsLabel}</div>` : ''}
-              </button>
-            `;
-          }).join('')}
-        </div>
-        <button class="btn-small" data-action="new-game" style="margin-top:1.5rem">↩ Start over (watch intro)</button>
+        <button class="btn-main" data-action="new-game">Begin the Quest →</button>
       `}
+    </div>
+  `;
+}
+
+function renderBattleIntro() {
+  const c = CHARACTERS[LEAD_ORDER[state.battleLeadIndex]];
+  return `
+    <div class="screen battle-intro">
+      <p class="battle-intro-loc">⚔ ${state.location}</p>
+      <div class="battle-intro-body">
+        <img class="battle-intro-portrait" src="${c.portrait}" alt="${c.name}"
+             style="filter: drop-shadow(0 0 28px ${c.color}77)">
+        <h2 class="battle-intro-name" style="color:${c.color}">${c.name.toUpperCase()}'S BATTLE</h2>
+        <p class="battle-intro-class" style="color:${c.color}">${c.class}</p>
+        <p class="battle-intro-tagline">${c.tagline}</p>
+        <p class="battle-intro-prompt">${c.name}, you're in charge.<br>Take the controls.</p>
+        <button class="btn-main" data-action="start-battle">Ready →</button>
+      </div>
     </div>
   `;
 }
@@ -287,8 +287,7 @@ function renderDialogue() {
 }
 
 function renderExploration() {
-  const ap = CHARACTERS[state.activePlayer];
-  const allWon = ['goblin','troll'].every(e => state.battlesWon.includes(e));
+  const allWon = ['goblin', 'troll', 'spider'].every(e => state.battlesWon.includes(e));
 
   if (allWon) {
     setTimeout(() => { state.screen = 'win'; render(); }, 100);
@@ -310,21 +309,27 @@ function renderExploration() {
       disabled: state.battlesWon.includes('troll'),
       doneText: '✓ Pass cleared',
     },
+    {
+      id: 'spider',
+      label: '🕷 Spider Hollow',
+      desc: 'Old forest road, east of the village. Nobody goes there anymore.',
+      disabled: state.battlesWon.includes('spider'),
+      doneText: '✓ Hollow cleared',
+    },
   ];
 
   return `
     <div class="screen exploration">
       <div class="explore-header">
         <span class="location-tag">📍 Millbrook Village</span>
-        <button class="btn-small" data-action="back-to-start">Change player</button>
       </div>
       <div class="explore-body">
         <p class="narration">
-          ${ap.name} stands at the edge of the village. Walter has a map.
+          Three brothers at the edge of the village. Walter has a map.
           James is already walking toward the forest without asking anyone.
         </p>
         <p class="narration">
-          Walter checks his notes: "Two problems to deal with before we can move on."
+          Walter checks his notes: "Three problems to deal with before we can move on."
         </p>
       </div>
       <div class="explore-choices">
@@ -356,12 +361,12 @@ function renderBattle() {
   const partyRows = ['leo','walter','james'].map(k => {
     const ch = CHARACTERS[k];
     const m = party[k];
-    const isActive = k === state.activePlayer;
+    const isLead = k === state.activePlayer;
     const isTurn = k === turn;
     return `
       <div class="party-row ${m.hp <= 0 ? 'knocked-out' : ''} ${isTurn ? 'active-turn' : ''}">
         <img class="party-portrait" src="${ch.portrait}" alt="${ch.name}" style="border-color:${isTurn ? ch.color : 'transparent'}">
-        <span class="party-name" style="color:${ch.color}">${ch.name}${isActive ? ' ★' : ''}</span>
+        <span class="party-name" style="color:${ch.color}">${ch.name}${isLead ? ' ★' : ''}</span>
         ${hpBar(m.hp, m.maxHp)}
       </div>
     `;
@@ -452,13 +457,12 @@ function renderDefeat() {
 }
 
 function renderWin() {
-  const ap = CHARACTERS[state.activePlayer];
   return `
     <div class="screen victory">
       <h2 class="victory-title">QUEST COMPLETE!</h2>
       <p class="victory-flavor">
-        The trail is clear. The pass is open.<br>
-        ${ap.name} leads the brothers back to the village.
+        The trail is clear. The pass is open. The hollow is safe.<br>
+        The brothers head back to the village together.
       </p>
       <p style="margin-top:1.5rem;color:#aaa;font-size:0.85rem;text-align:center">
         James is already planning the next adventure.<br>
@@ -473,43 +477,12 @@ function renderWin() {
   `;
 }
 
-function renderHandoff() {
-  const ap = CHARACTERS[state.activePlayer];
-  const others = ['leo','walter','james'].filter(k => k !== state.activePlayer);
-  return `
-    <div class="screen victory">
-      <h2 class="victory-title" style="font-size:1.8rem">Nice work, ${ap.name}!</h2>
-      <p class="victory-flavor">
-        You've won <b>${state.sessionWins}</b> battle${state.sessionWins !== 1 ? 's' : ''} this sitting.
-        Time to let a brother take a turn?
-      </p>
-      <div style="display:flex;gap:1rem;justify-content:center;margin-top:1.5rem;flex-wrap:wrap">
-        ${others.map(k => {
-          const c = CHARACTERS[k];
-          return `
-            <button class="player-card" data-action="choose-player" data-value="${k}" style="border-color:${c.color}">
-              <div class="card-name" style="color:${c.color}">${c.name.toUpperCase()}</div>
-              <div class="card-class">${c.class}</div>
-              <div class="card-wins" style="color:${c.color}">${state.totalWins[k]} battles won</div>
-            </button>
-          `;
-        }).join('')}
-      </div>
-      <button class="btn-small" data-action="keep-going" style="margin-top:1.5rem">
-        Keep going as ${ap.name}
-      </button>
-    </div>
-  `;
-}
-
 // ─── Actions ──────────────────────────────────────────────────────────────────
 
 function handleAction(action, value) {
   switch (action) {
 
-    case 'choose-player': {
-      state.activePlayer = value;
-      state.sessionWins = 0;
+    case 'continue-game': {
       initParty();
       state.screen = 'exploration';
       render();
@@ -517,6 +490,7 @@ function handleAction(action, value) {
     }
 
     case 'enter-battle': {
+      state.activePlayer = LEAD_ORDER[state.battleLeadIndex];
       const enemyTemplate = ENEMIES[value];
       state.enemy = {
         ...enemyTemplate,
@@ -524,7 +498,9 @@ function handleAction(action, value) {
         stunned: false,
         weakened: false,
       };
-      state.location = value === 'goblin' ? 'Darkwood Trail' : 'Mountain Pass';
+      state.location = value === 'goblin' ? 'Darkwood Trail'
+                     : value === 'troll'  ? 'Mountain Pass'
+                     : 'Spider Hollow';
       state.battleLog = [enemyTemplate.intro];
       state.pendingLogLines = [enemyTemplate.intro];
       state.currentTurn = 'leo';
@@ -532,6 +508,12 @@ function handleAction(action, value) {
       state.takeHitActive = false;
       state.mockActive = false;
       state.shieldWallActive = false;
+      state.screen = 'battle_intro';
+      render();
+      break;
+    }
+
+    case 'start-battle': {
       state.screen = 'battle';
       render();
       break;
@@ -568,17 +550,6 @@ function handleAction(action, value) {
     }
 
     case 'back-to-explore': {
-      // After a victory, check if it's time to suggest a handoff
-      if (state.sessionWins >= SESSION_LIMIT) {
-        state.screen = 'handoff';
-      } else {
-        state.screen = 'exploration';
-      }
-      render();
-      break;
-    }
-
-    case 'keep-going': {
       state.screen = 'exploration';
       render();
       break;
@@ -586,8 +557,8 @@ function handleAction(action, value) {
 
     case 'new-game': {
       clearSave();
-      state.sessionWins = 0;
-      startDialogue('prologue', 'who_playing');
+      initParty();
+      startDialogue('prologue', 'exploration');
       break;
     }
 
@@ -626,12 +597,6 @@ function handleAction(action, value) {
       break;
     }
 
-    case 'back-to-start': {
-      state.screen = 'who_playing';
-      render();
-      break;
-    }
-
     case 'retry-battle': {
       // Re-enter same battle with reset party
       initParty();
@@ -653,8 +618,8 @@ function handleAction(action, value) {
 
 function recordWin() {
   state.battlesWon.push(state.enemy.id);
-  state.sessionWins++;
   state.totalWins[state.activePlayer]++;
+  state.battleLeadIndex = (state.battleLeadIndex + 1) % 3;
   saveGame();
 }
 
@@ -733,16 +698,13 @@ function doEnemyTurn() {
   state.turnIndex = 0;
   state.currentTurn = 'leo';
 
-  // Clear round-start buffs
-  // (buffs persist until used — handled inside resolveAbility)
-
   render();
 }
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 
 document.addEventListener('DOMContentLoaded', () => {
-  loadGame();  // restore battlesWon and totalWins from localStorage
+  loadGame();  // restore progress from localStorage
 
   document.getElementById('app').addEventListener('click', e => {
     const btn = e.target.closest('[data-action]');

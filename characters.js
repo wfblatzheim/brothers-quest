@@ -4,7 +4,10 @@ const CHARACTERS = {
     class: 'Paladin',
     tagline: '"Lead the charge."',
     maxHp: 55,
-    attack: 12,
+    might: 14,   // hits hard up front
+    guard: 6,    // ~23% damage reduction — he's the tank
+    speed: 6,    // slow and deliberate
+    cunning: 6,  // straightforward; stun chance modest
     color: '#f4a843',
     portrait: 'pictures/paladinwarrior.png',
     abilities: [
@@ -30,7 +33,10 @@ const CHARACTERS = {
     class: 'Inventor',
     tagline: '"Build smarter."',
     maxHp: 42,
-    attack: 10,
+    might: 8,    // throws things — output is low but scan/gadgets are the real weapon
+    guard: 3,    // ~13% reduction — smarter positioning than Leo, lighter armor
+    speed: 10,   // quick enough to act before slow enemies, set up combos
+    cunning: 16, // scan multiplier, heal amount, gadget reliability all scale from here
     color: '#4fc3f7',
     portrait: 'pictures/inventor.png',
     abilities: [
@@ -56,7 +62,10 @@ const CHARACTERS = {
     class: 'Trickster',
     tagline: '"Fair fights? Never."',
     maxHp: 38,
-    attack: 14,
+    might: 12,   // sneak attacks hit hard; Wild Card big rolls scale well
+    guard: 2,    // ~9% reduction — glass cannon, goes down fast if caught
+    speed: 16,   // 16% passive dodge; Mock is highly reliable
+    cunning: 12, // Wild Card skews toward better outcomes; stun on throws
     color: '#81c784',
     portrait: 'pictures/trickster.png',
     abilities: [
