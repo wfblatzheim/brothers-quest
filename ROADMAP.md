@@ -13,16 +13,17 @@ Built in plain HTML/CSS/JS. Playable by opening `index.html` in a browser.
 - [x] Event delegation via `data-action` attributes
 - [x] Typewriter animation for battle log lines
 - [x] localStorage save/load (version 1)
-- [x] Session handoff mechanic — after 3 wins, prompts to pass to a brother
+- [x] Per-battle lead rotation — `battleLeadIndex` cycles through brothers each win (Leo → Walter → James → repeat); the lead brother is highlighted in battle UI
 
 ### Characters
 - [x] Leo (Paladin) — Shield Bash, Rally Brothers, Take the Hit
 - [x] Walter (Inventor) — Field Repair, Throw the Thing!, Scan
 - [x] James (Trickster) — Sneak Attack, Mock Enemy, Wild Card
+- [x] 4-stat system (might / guard / speed / cunning) fully wired into ability formulas and damage/dodge resolution
 - [x] Per-character color, portrait, HP, class, tagline
 
 ### Battles
-- [x] Two enemies: Goblin Raider, Cave Troll
+- [x] Three demo enemies: Goblin Raider (Darkwood Trail), Cave Troll (Mountain Pass), Giant Spider (Spider Hollow)
 - [x] Status effects: stunned, weakened, buffed, scanned (double damage)
 - [x] `applyDamage()` helper handles scan bonus
 - [x] Enemy turn resolution with `mock` dodge and `take_hit` intercept
@@ -38,8 +39,12 @@ Built in plain HTML/CSS/JS. Playable by opening `index.html` in a browser.
 ### Art & Presentation
 - [x] Dark RPG color scheme
 - [x] Character portraits in battle (Leo, Walter, James)
+- [x] Active-turn portrait highlight (colored border on current character's portrait)
 - [x] Portrait stands in dialogue (character shown outside the text box)
 - [x] Leo has a "normal clothes" portrait for prologue (`warriornormal.png`)
+
+### World & Story
+- [x] STORY_BIBLE.md — full story structure, dreamscapes, characters, tone guide
 
 ### Infrastructure
 - [x] GitHub repo: https://github.com/wfblatzheim/brothers-quest
@@ -108,4 +113,4 @@ Built in plain HTML/CSS/JS. Playable by opening `index.html` in a browser.
 
 ---
 
-*Last updated: March 2026*
+*Last updated: March 28, 2026*

@@ -18,6 +18,10 @@ their character. Whoever picks becomes the **main character** (addressed by NPCs
 the party). The other two brothers are party members controlled by whoever is at the
 keyboard that session.
 
+Each battle rotates which brother **leads** — Leo first, then Walter, then James, then
+back to Leo. The lead is highlighted in the battle UI. This naturally passes the spotlight
+without prompting.
+
 One shared save file — all progress is shared. When Walter plays and wins a battle,
 all three characters gain XP. This rewards whoever plays most while keeping things fair.
 
@@ -44,9 +48,9 @@ apart and rebuilds it better.
 
 | Ability | Effect |
 |---|---|
-| Deploy Gadget | Throws a contraption — damages or debuffs enemies |
-| Analyze Weakness | Studies the enemy; next hit does double damage |
-| Overclock | Supercharges Leo or James for one turn |
+| Field Repair | Patches up whoever is hurting most |
+| Throw the Thing! | Walter hurls whatever's closest — always something different |
+| Scan | Finds the weak point — next hit deals scaled bonus damage |
 
 Walter doesn't cast spells — he *builds* things. His abilities feel clever.
 
@@ -60,7 +64,7 @@ hates being left behind.
 |---|---|
 | Sneak Attack | Hits hard when enemies aren't expecting it |
 | Mock Enemy | Taunts enemy so hard they waste their turn attacking James, who dodges |
-| Wild Build | Minecraft nod — James builds something random mid-battle. Always spectacular, never predictable |
+| Wild Card | James does something. Nobody knows what. Always spectacular, never predictable |
 
 James's ability descriptions should have attitude. Example: *"James mocks the goblin's
 hat. The goblin is furious."*
@@ -153,16 +157,15 @@ the build simple and puts storytelling front and center.
 ## Tech stack
 
 - **HTML + CSS + JavaScript** — no framework, no build tools, no install
-- Five files to start: `index.html`, `style.css`, `game.js`, `characters.js`, `battles.js`
+- Six core files: `index.html`, `style.css`, `game.js`, `characters.js`, `battles.js`, `dialogue.js`
 - Open `index.html` in Chrome/Edge to play
 - Copy the whole folder to Windows PC to play there
-- Story/world content not yet designed — that's the next big conversation
+- Story/world content lives in `STORY_BIBLE.md` — the dreamscape structure, big bad, and arc are sketched out there
 
 ---
 
 ## Still to decide
 
-- Game name (Brothers Quest is a placeholder)
-- The story: setting, big bad, world name, towns, arc
+- Game name (Brothers Quest is a working title — "The Sleeping World" appears as subtitle in ROADMAP)
 - Whether the boys help build it or it's a surprise
-- Visual style: pixel art portraits for each character, color palette, fonts
+- Visual style: pixel art portraits for each character, final color palette
