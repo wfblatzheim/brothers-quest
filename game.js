@@ -15,7 +15,6 @@ const state = {
   currentTurn: 'leo',
   turnOrder: ['leo', 'walter', 'james'],
   turnIndex: 0,
-  awaitingOverclockTarget: false,
   takeHitActive: false,
   mockActive: false,
   shieldWallActive: false,
@@ -39,7 +38,6 @@ function initParty() {
       maxHp: CHARACTERS[k].maxHp,
       stunned: false,
       buffed: false,
-      overclocked: false,
     };
   });
 }
@@ -371,20 +369,7 @@ function renderBattle() {
 
   // Build ability buttons
   let actionArea = '';
-  if (state.awaitingOverclockTarget) {
-    actionArea = `
-      <p class="turn-label">⚡ Who does Walter overclock?</p>
-      <div class="ability-grid">
-        <button class="ability-btn" data-action="use-ability" data-value="overclock_leo" ${party.leo.hp <= 0 ? 'disabled' : ''}>
-          <span class="ability-name">⚔ Leo</span>
-        </button>
-        <button class="ability-btn" data-action="use-ability" data-value="overclock_james" ${party.james.hp <= 0 ? 'disabled' : ''}>
-          <span class="ability-name">🗡 James</span>
-        </button>
-        <button class="ability-btn secondary" data-action="cancel-overclock">Cancel</button>
-      </div>
-    `;
-  } else if (!isAlive) {
+  if (!isAlive) {
     // Skip knocked-out characters automatically
     actionArea = `<p class="turn-label">${c.name} is knocked out. Skipping...</p>`;
     setTimeout(() => advanceTurn(), 600);
@@ -544,7 +529,6 @@ function handleAction(action, value) {
       state.pendingLogLines = [enemyTemplate.intro];
       state.currentTurn = 'leo';
       state.turnIndex = 0;
-      state.awaitingOverclockTarget = false;
       state.takeHitActive = false;
       state.mockActive = false;
       state.shieldWallActive = false;
@@ -554,13 +538,6 @@ function handleAction(action, value) {
     }
 
     case 'use-ability': {
-      if (value === 'overclock') {
-        state.awaitingOverclockTarget = true;
-        render();
-        break;
-      }
-
-      state.awaitingOverclockTarget = false;
       state.pendingLogLines = [];  // reset at start of each new user action
       const battleState = getBattleState();
       const logs = resolveAbility(value, battleState);
@@ -581,12 +558,6 @@ function handleAction(action, value) {
       }
 
       advanceTurn();
-      break;
-    }
-
-    case 'cancel-overclock': {
-      state.awaitingOverclockTarget = false;
-      render();
       break;
     }
 
@@ -670,7 +641,6 @@ function handleAction(action, value) {
       state.pendingLogLines = [enemyTemplate.intro];
       state.currentTurn = 'leo';
       state.turnIndex = 0;
-      state.awaitingOverclockTarget = false;
       state.takeHitActive = false;
       state.mockActive = false;
       state.shieldWallActive = false;

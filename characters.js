@@ -45,9 +45,9 @@ const CHARACTERS = {
         desc: "Walter hurls whatever's closest. It's always something.",
       },
       {
-        id: 'overclock',
-        name: '⚡ Overclock',
-        desc: 'Supercharges Leo or James — pick a target',
+        id: 'scan',
+        name: '🔬 Scan',
+        desc: 'Walter finds the weak point — next hit deals double damage',
       },
     ],
   },

@@ -40,6 +40,17 @@ function pick(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
+// Apply damage to enemy, doubling if Walter has scanned them
+function applyDamage(enemy, dmg) {
+  let final = dmg;
+  if (enemy.scanned) {
+    final *= 2;
+    enemy.scanned = false;
+  }
+  enemy.hp = Math.max(0, enemy.hp - final);
+  return final;
+}
+
 // Resolve an ability use. Returns { log: string[], stateChanges: {} }
 // stateChanges are applied to the battle state by game.js
 function resolveAbility(abilityId, battleState) {
@@ -51,8 +62,7 @@ function resolveAbility(abilityId, battleState) {
 
     // ── LEO ──────────────────────────────────────────────
     case 'shield_bash': {
-      const dmg = rand(14, 20);
-      enemy.hp = Math.max(0, enemy.hp - dmg);
+      const dmg = applyDamage(enemy, rand(14, 20));
       logs.push(`Leo slams the enemy with his shield. <b>${dmg} damage!</b>`);
       if (Math.random() < 0.4) {
         enemy.stunned = true;
@@ -96,41 +106,28 @@ function resolveAbility(abilityId, battleState) {
         'what appears to be a battery', 'his lunch',
       ];
       const item = pick(items);
-      const dmg = rand(11, 19);
       const stunned = Math.random() < 0.25;
+      const dmg = applyDamage(enemy, rand(11, 19));
       logs.push(`Walter grabs ${item} and hurls it at the ${enemy.name}. <b>${dmg} damage!</b>`);
       if (stunned) {
         enemy.stunned = true;
         logs.push(`Direct hit to the face. The ${enemy.name} is stunned!`);
       }
-      enemy.hp = Math.max(0, enemy.hp - dmg);
       break;
     }
 
-    case 'overclock': {
-      // Caller sets awaitingOverclockTarget — this case handled separately
-      break;
-    }
-
-    case 'overclock_leo': {
-      party.leo.overclocked = true;
-      logs.push(`Walter points at Leo. "You're up." <b>Leo's next attack deals double damage.</b>`);
-      break;
-    }
-
-    case 'overclock_james': {
-      party.james.overclocked = true;
-      logs.push(`Walter points at James. "You're up." James grins. <b>James's next attack deals double damage.</b>`);
+    case 'scan': {
+      enemy.scanned = true;
+      logs.push(`Walter studies the ${enemy.name} carefully. "There. I see it."`);
+      logs.push(`<b>The next hit will deal double damage.</b>`);
       break;
     }
 
     // ── JAMES ─────────────────────────────────────────────
     case 'sneak': {
-      const baseDmg = rand(16, 22);
-      const boosted = party.james.overclocked || party.james.buffed;
-      const finalDmg = boosted ? Math.round(baseDmg * 1.75) : baseDmg;
-      enemy.hp = Math.max(0, enemy.hp - finalDmg);
-      party.james.overclocked = false;
+      const base = rand(16, 22);
+      const boosted = party.james.buffed;
+      const finalDmg = applyDamage(enemy, boosted ? Math.round(base * 1.75) : base);
       party.james.buffed = false;
       logs.push(`James appears from nowhere and hits for <b>${finalDmg} damage!</b>`);
       break;
@@ -151,8 +148,7 @@ function resolveAbility(abilityId, battleState) {
     case 'wild_card': {
       const roll = rand(1, 5);
       if (roll === 1) {
-        const dmg = rand(22, 32);
-        enemy.hp = Math.max(0, enemy.hp - dmg);
+        const dmg = applyDamage(enemy, rand(22, 32));
         logs.push(`James fake-faints. The ${enemy.name} celebrates.`);
         logs.push(`James attacks from behind. <b>${dmg} damage!!</b>`);
       } else if (roll === 2) {
@@ -160,9 +156,10 @@ function resolveAbility(abilityId, battleState) {
         logs.push(`James throws a handful of dirt directly into the ${enemy.name}'s face.`);
         logs.push(`The ${enemy.name} can't see anything. <b>It skips its next turn.</b>`);
       } else if (roll === 3) {
-        // Enemy attacks itself
+        // Enemy attacks itself — scan bonus doesn't apply here (it punched itself)
         const selfDmg = rand(Math.floor(enemy.attack * 0.6), enemy.attack);
         enemy.hp = Math.max(0, enemy.hp - selfDmg);
+        enemy.scanned = false;
         logs.push(`James says something so confusing to the ${enemy.name} that it punches itself.`);
         logs.push(`<b>${selfDmg} damage to the ${enemy.name}.</b>`);
       } else if (roll === 4) {
