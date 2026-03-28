@@ -6,6 +6,7 @@ const CHARACTERS = {
     maxHp: 55,
     attack: 12,
     color: '#f4a843',
+    portrait: 'pictures/paladinwarrior.png',
     abilities: [
       {
         id: 'shield_bash',
@@ -31,6 +32,7 @@ const CHARACTERS = {
     maxHp: 42,
     attack: 10,
     color: '#4fc3f7',
+    portrait: 'pictures/inventor.png',
     abilities: [
       {
         id: 'repair',
@@ -56,6 +58,7 @@ const CHARACTERS = {
     maxHp: 38,
     attack: 14,
     color: '#81c784',
+    portrait: 'pictures/trickster.png',
     abilities: [
       {
         id: 'sneak',

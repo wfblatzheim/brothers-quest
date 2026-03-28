@@ -257,24 +257,31 @@ function renderWhoPlaying() {
 }
 
 function renderDialogue() {
-  const scene  = SCENES[state.dialogueScene];
-  const line   = scene[state.dialogueLine];
-  const spk    = line.speaker ? SPEAKERS[line.speaker] : null;
-  const isLast = state.dialogueLine === scene.length - 1;
+  const scene   = SCENES[state.dialogueScene];
+  const line    = scene[state.dialogueLine];
+  const spk     = line.speaker ? SPEAKERS[line.speaker] : null;
+  const isLast  = state.dialogueLine === scene.length - 1;
+  const portrait = spk?.portrait;
 
   return `
     <div class="dialogue-screen" data-action="advance-dialogue">
-      <div class="dialogue-box">
-        <div class="dialogue-speaker-row">
-          ${spk
-            ? `<span class="dialogue-speaker" style="color:${spk.color}">${spk.name}</span>`
-            : `<span class="dialogue-speaker narrator">—</span>`
-          }
-          <span class="dialogue-progress">${state.dialogueLine + 1} / ${scene.length}</span>
-        </div>
-        <div id="dialogue-text" class="dialogue-text ${!spk ? 'narrator' : ''}"></div>
-        <div class="dialogue-continue">
-          ${isLast ? 'Begin →' : '▶'}
+      <div class="dialogue-outer">
+        ${portrait ? `
+          <div class="dialogue-portrait-stand">
+            <img src="${portrait}" alt="${spk.name}"
+                 style="filter: drop-shadow(0 0 18px ${spk.color}55)">
+          </div>
+        ` : ''}
+        <div class="dialogue-box">
+          <div class="dialogue-speaker-row">
+            ${spk
+              ? `<span class="dialogue-speaker" style="color:${spk.color}">${spk.name}</span>`
+              : `<span class="dialogue-speaker narrator">—</span>`
+            }
+            <span class="dialogue-progress">${state.dialogueLine + 1} / ${scene.length}</span>
+          </div>
+          <div id="dialogue-text" class="dialogue-text ${!spk ? 'narrator' : ''}"></div>
+          <div class="dialogue-continue">${isLast ? 'Begin →' : '▶'}</div>
         </div>
       </div>
     </div>
@@ -355,6 +362,7 @@ function renderBattle() {
     const isTurn = k === turn;
     return `
       <div class="party-row ${m.hp <= 0 ? 'knocked-out' : ''} ${isTurn ? 'active-turn' : ''}">
+        <img class="party-portrait" src="${ch.portrait}" alt="${ch.name}" style="border-color:${isTurn ? ch.color : 'transparent'}">
         <span class="party-name" style="color:${ch.color}">${ch.name}${isActive ? ' ★' : ''}</span>
         ${hpBar(m.hp, m.maxHp)}
       </div>

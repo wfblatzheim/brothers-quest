@@ -1,11 +1,11 @@
 // ─── Speakers ────────────────────────────────────────────────────────────────
 
 const SPEAKERS = {
-  leo:    { name: 'Leo',    color: '#f4a843' },
-  walter: { name: 'Walter', color: '#4fc3f7' },
-  james:  { name: 'James',  color: '#81c784' },
-  moth:   { name: 'Moth',   color: '#c4a882' },  // before James names her
-  dusty:  { name: 'Dusty',  color: '#c4a882' },  // after
+  leo:    { name: 'Leo',    color: '#f4a843', portrait: 'pictures/warriornormal.png' },
+  walter: { name: 'Walter', color: '#4fc3f7', portrait: 'pictures/inventor.png' },
+  james:  { name: 'James',  color: '#81c784', portrait: 'pictures/trickster.png' },
+  moth:   { name: 'Moth',   color: '#c4a882', portrait: null },
+  dusty:  { name: 'Dusty',  color: '#c4a882', portrait: null },
 };
 
 // ─── Scenes ──────────────────────────────────────────────────────────────────
@@ -36,7 +36,7 @@ const SCENES = {
     { speaker: 'moth',   text: 'I have been on this table for eleven minutes. I am only now getting your attention.' },
     { speaker: 'james',  text: 'THE MOTH IS TALKING.' },
     { speaker: 'moth',   text: 'Yes. I am aware.' },
-    { speaker: 'walter', text: 'How are you doing that.' },
+    { speaker: 'walter', text: 'How are you doing that?' },
     { speaker: 'moth',   text: 'I was sent. Before you were born — before your father was born — I was sent, because something was coming and someone had to carry the message. That someone was me. I have been carrying it since. Would you like to hear it, or shall we continue with the shouting?' },
 
     // The message
@@ -44,7 +44,7 @@ const SCENES = {
     { speaker: 'moth',   text: 'The Dreamer has been taken. He has been dreaming the world\'s dreams since before anyone can remember. While he dreams, the world wakes. Without him, it freezes — exactly as you see. You have until sunrise.' },
     { speaker: 'leo',    text: 'Who took him?' },
     { speaker: 'moth',   text: 'The Nightmare King. He lives in the space between sleeping and waking. He has been patient. He chose his moment.' },
-    { speaker: 'walter', text: 'And we\'re supposed to do what, exactly.' },
+    { speaker: 'walter', text: 'And we\'re supposed to do what, exactly?' },
     { speaker: 'moth',   text: 'Get him back. You can cross because you are children, and children still remember how. That is not a metaphor. It is simply true.' },
     { speaker: 'leo',    text: 'How do we get in?' },
     { speaker: 'moth',   text: 'I can open the door. I have been waiting to open the door for a very long time.' },
